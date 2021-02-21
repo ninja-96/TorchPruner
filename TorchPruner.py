@@ -21,16 +21,17 @@ def prune_model(model, prune_protopyte):
             w_shape_2 = torch.tensor(module_2.weight.shape)
             w_diff = torch.abs(w_shape_1 - w_shape_2)
 
-            if w_diff[0] > 0:
-                prune.ln_structured(module_1, name="weight", amount=int(w_diff[0].item()), n=1, dim=0)
+            if w_diff[0] > 0 or w_diff[1] > 0:
+                if w_diff[0] > 0:
+                    prune.ln_structured(module_1, name="weight", amount=int(w_diff[0].item()), n=1, dim=0)
 
-            if w_diff[1] > 0:
-                prune.ln_structured(module_1, name="weight", amount=int(w_diff[1].item()), n=1, dim=1)
+                if w_diff[1] > 0:
+                    prune.ln_structured(module_1, name="weight", amount=int(w_diff[1].item()), n=1, dim=1)
 
-            mask = module_1.weight_mask
-            w = torch.where(mask != 0)
-            w_mask = torch.unique(w[0])
-            module_1.register_parameter('w_mask', nn.Parameter(w_mask.float()))
+                mask = module_1.weight_mask
+                w = torch.where(mask != 0)
+                w_mask = torch.unique(w[0])
+                module_1.register_parameter('w_mask', nn.Parameter(w_mask.float()))
 
             continue
 

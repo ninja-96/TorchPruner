@@ -162,7 +162,7 @@ class ResNet(nn.Module):
             block: Type[Union[BasicBlock, Bottleneck]],
             layers: List[int],
             num_classes: int = 1000,
-            features: List[int] = [64, 64, 128, 256, 512],
+            features: List[int] = [64, 128, 256, 512],
             expansion: int = 4,
             zero_init_residual: bool = False,
             groups: int = 1,
@@ -193,15 +193,15 @@ class ResNet(nn.Module):
         self.bn1 = norm_layer(features[0])
         self.relu = nn.ReLU(inplace=True)
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
-        self.layer1 = self._make_layer(block, features[1], layers[0])
-        self.layer2 = self._make_layer(block, features[2], layers[1], stride=2,
+        self.layer1 = self._make_layer(block, features[0], layers[0])
+        self.layer2 = self._make_layer(block, features[1], layers[1], stride=2,
                                        dilate=replace_stride_with_dilation[0])
-        self.layer3 = self._make_layer(block, features[3], layers[2], stride=2,
+        self.layer3 = self._make_layer(block, features[2], layers[2], stride=2,
                                        dilate=replace_stride_with_dilation[1])
-        self.layer4 = self._make_layer(block, features[4], layers[3], stride=2,
+        self.layer4 = self._make_layer(block, features[3], layers[3], stride=2,
                                        dilate=replace_stride_with_dilation[2])
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(features[4] * block.expansion, num_classes)
+        self.fc = nn.Linear(features[3] * block.expansion, num_classes)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):

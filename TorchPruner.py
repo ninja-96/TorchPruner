@@ -109,9 +109,18 @@ def prune_model(model, prune_protopyte):
                         prune_protopyte_state_dict[f'{layer}.bias'].shape)
                 continue
         else:
-            prune_protopyte_state_dict[f'{layer}.weight'] = model.state_dict()[f'{layer}.weight']
-            if f'{layer}.bias' in model.state_dict().keys():
-                prune_protopyte_state_dict[f'{layer}.bias'] = model.state_dict()[f'{layer}.bias']
+            if tree_dict[f'{layer}'] in ['Conv2d', 'Linear']:
+                prune_protopyte_state_dict[f'{layer}.weight'] = model.state_dict()[f'{layer}.weight']
+                if f'{layer}.bias' in model.state_dict().keys():
+                    prune_protopyte_state_dict[f'{layer}.bias'] = model.state_dict()[f'{layer}.bias']
+
+            if tree_dict[f'{layer}'] in ['Batch', 'BatchNorm2d']:
+                prune_protopyte_state_dict[f'{layer}.weight'] = model.state_dict()[f'{layer}.weight']
+                prune_protopyte_state_dict[f'{layer}.running_mean'] = model.state_dict()[f'{layer}.running_mean']
+                prune_protopyte_state_dict[f'{layer}.running_var'] = model.state_dict()[f'{layer}.running_var']
+
+                if f'{layer}.bias' in model.state_dict().keys():
+                    prune_protopyte_state_dict[f'{layer}.bias'] = model.state_dict()[f'{layer}.bias']
 
     prune_protopyte.load_state_dict(prune_protopyte_state_dict)
     return prune_protopyte
